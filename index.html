@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="虹の広場ナビ">
+<title>虹の広場ルートナビ</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+body { font-family:-apple-system,'Hiragino Sans',sans-serif; background:#eef1f5; color:#222; padding-bottom:40px; }
+.header { background:linear-gradient(135deg,#c0392b,#e74c3c,#f39c12); color:#fff; padding:18px 20px; text-align:center; position:sticky; top:0; z-index:20; box-shadow:0 2px 10px rgba(0,0,0,.15); }
+.header .title { font-size:20px; font-weight:800; letter-spacing:1px; }
+.header .sub { font-size:12px; opacity:.9; margin-top:2px; }
+.header .clock { font-size:14px; margin-top:4px; }
+.header .day-badge { display:inline-block; background:rgba(255,255,255,.25); padding:2px 10px; border-radius:12px; font-size:12px; margin-left:4px; }
+.dir-tabs { display:flex; position:sticky; top:76px; z-index:19; background:#eef1f5; padding:10px 12px 4px; gap:8px; }
+.dir-tab { flex:1; padding:10px; text-align:center; font-size:15px; font-weight:700; border:none; border-radius:10px 10px 0 0; cursor:pointer; }
+.dir-tab.active { background:#fff; color:#c0392b; box-shadow:0 -2px 6px rgba(0,0,0,.06); }
+.dir-tab:not(.active) { background:#d5dae1; color:#666; }
+.wrap { padding:0 12px; }
+.panel { display:none; }
+.panel.active { display:block; }
+.route-card { background:#fff; border-radius:12px; margin-bottom:14px; overflow:hidden; box-shadow:0 1px 4px rgba(0,0,0,.06); }
+.route-head { padding:12px 16px; display:flex; align-items:center; justify-content:space-between; cursor:pointer; }
+.route-name { font-size:15px; font-weight:700; }
+.route-tag { font-size:11px; padding:2px 8px; border-radius:10px; color:#fff; margin-left:8px; }
+.tag-fast { background:#27ae60; }
+.tag-alt { background:#2e86c1; }
+.tag-walk { background:#e67e22; }
+.route-meta { font-size:12px; color:#888; }
+.route-body { padding:0 16px 14px; }
+.next-dep { background:#fef9e7; border-radius:8px; padding:10px 12px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center; }
+.next-dep .lbl { font-size:11px; color:#999; }
+.next-dep .val { font-size:22px; font-weight:800; color:#c0392b; }
+.next-dep .diff { font-size:13px; font-weight:600; padding:3px 9px; border-radius:14px; }
+.diff.urgent { color:#e74c3c; background:#fdecea; }
+.diff.soon { color:#e67e22; background:#fef5e7; }
+.diff.normal { color:#555; background:#f0f0f0; }
+.steps { border-left:3px solid #eee; margin-left:6px; padding-left:14px; }
+.step { padding:6px 0; font-size:13px; position:relative; }
+.step::before { content:''; position:absolute; left:-20px; top:11px; width:9px; height:9px; border-radius:50%; background:#e74c3c; }
+.step .st-time { font-weight:700; color:#c0392b; }
+.step .st-mode { color:#666; }
+.step .st-place { font-weight:600; }
+.deps-list { margin-top:8px; }
+.deps-title { font-size:11px; color:#999; margin-bottom:4px; }
+.dep-chips { display:flex; flex-wrap:wrap; gap:6px; }
+.dep-chip { font-size:13px; padding:4px 9px; border-radius:8px; background:#f0f3f7; font-weight:600; }
+.dep-chip.now { background:#c0392b; color:#fff; }
+.empty { color:#999; font-size:13px; padding:8px 0; }
+.note { font-size:10px; color:#999; text-align:center; margin:16px 12px 0; line-height:1.7; }
+.total-time { font-size:12px; color:#27ae60; font-weight:700; }
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="title">🌈 虹の広場ナビ</div>
+  <div class="sub">豊洲一丁目 ⇄ 総合レクリエーション公園</div>
+  <div class="clock"><span id="clock">--:--</span><span class="day-badge" id="dayBadge">--</span></div>
+</div>
+
+<div class="dir-tabs">
+  <button class="dir-tab active" onclick="showDir('go')">🚉 行き</button>
+  <button class="dir-tab" onclick="showDir('back')">🏠 帰り</button>
+</div>
+
+<div class="wrap">
+  <div class="panel active" id="panel-go">
+    <div class="route-card">
+      <div class="route-head">
+        <div><span class="route-name">門仲経由</span><span class="route-tag tag-fast">最速</span></div>
+        <div class="route-meta total-time">約35分</div>
+      </div>
+      <div class="route-body">
+        <div class="steps">
+          <div class="step"><span class="st-time" id="go-b-t1">--:--</span> <span class="st-place">豊洲一丁目</span> <span class="st-mode">🚌門19</span></div>
+          <div class="step"><span class="st-mode">→ 門前仲町（約8分）</span></div>
+          <div class="step"><span class="st-mode">🚇東西線 → 西葛西（約12分）</span></div>
+          <div class="step"><span class="st-mode">🚶 虹の広場（徒歩7分）</span></div>
+        </div>
+        <div class="deps-list">
+          <div class="deps-title">▼ 豊洲一丁目発 門19（門前仲町方面）2時間以内</div>
+          <div class="dep-chips" id="go-b-deps"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="route-card">
+      <div class="route-head">
+        <div><span class="route-name">越中島・京葉線経由</span><span class="route-tag tag-alt">景色◎</span></div>
+        <div class="route-meta total-time">約40分</div>
+      </div>
+      <div class="route-body">
+        <div class="steps">
+          <div class="step"><span class="st-place">豊洲一丁目</span> <span class="st-mode">🚌門19 → 越中島（約5分）</span></div>
+          <div class="step"><span class="st-mode">🚃京葉線 → 葛西臨海公園（約11分）</span></div>
+          <div class="step"><span class="st-mode">🚌臨海28 → 総合レク公園前（約5分）</span></div>
+        </div>
+        <div class="deps-list">
+          <div class="deps-title">▼ 越中島発 京葉線・蘇我方面（葛西臨海公園行）2時間以内</div>
+          <div class="dep-chips" id="go-k-deps"></div>
+        </div>
+        <div class="deps-list">
+          <div class="deps-title">▼ 葛西臨海公園駅発 臨海28（総合レク公園前）2時間以内</div>
+          <div class="dep-chips" id="go-r-deps"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="route-card">
+      <div class="route-head">
+        <div><span class="route-name">乗り遅れ→徒歩リカバリー</span><span class="route-tag tag-walk">保険</span></div>
+      </div>
+      <div class="route-body">
+        <div class="empty">豊洲一丁目で門19に乗り遅れたら、都立三商前まで歩いて（約10分）門19か海01を拾う。下の帰りタブの海01時刻も参照。</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel" id="panel-back">
+    <div class="route-card">
+      <div class="route-head">
+        <div><span class="route-name">西葛西→門仲→門19</span><span class="route-tag tag-fast">推奨</span></div>
+        <div class="route-meta total-time">約30分</div>
+      </div>
+      <div class="route-body">
+        <div class="steps">
+          <div class="step"><span class="st-mode">🚶 虹の広場 → 西葛西駅（徒歩7分）</span></div>
+          <div class="step"><span class="st-mode">🚇東西線 → 門前仲町（約12分）</span></div>
+          <div class="step"><span class="st-mode">🚌門19 → 豊洲一丁目（約8分）</span></div>
+        </div>
+        <div class="deps-list">
+          <div class="deps-title">▼ 門前仲町発 門19（東京ビッグサイト方面＝豊洲一丁目行）2時間以内</div>
+          <div class="dep-chips" id="bk-19-deps"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="route-card">
+      <div class="route-head">
+        <div><span class="route-name">門仲→海01（都立三商方面）</span><span class="route-tag tag-alt">次善</span></div>
+      </div>
+      <div class="route-body">
+        <div class="steps">
+          <div class="step"><span class="st-mode">🚇東西線 → 門前仲町</span></div>
+          <div class="step"><span class="st-mode">🚌海01 → 都立三商前 → 豊洲方面</span></div>
+        </div>
+        <div class="deps-list">
+          <div class="deps-title">▼ 門前仲町発 海01（越中島方面）2時間以内</div>
+          <div class="dep-chips" id="bk-umi-deps"></div>
+        </div>
+        <div class="empty" style="margin-top:8px">※門19に乗れるなら門19が優先。海01は都立三商前・越中島方面。</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="note">
+  出典：都営バス公式(tobus.jp)/NAVITIME/駅探（平日ダイヤ）<br>
+  時刻は目安。道路混雑・接続により変動あり<br>
+  ⚡ 7/21〜7/27 フォーミュラE交通規制で門19エリア遅延の可能性
+</div>
+
+<script>
+const GO_B = ["07:03","07:19","07:35","07:50","08:06","08:22","08:37","08:54","09:15","09:32","10:06","10:38","11:25","12:19","13:09","14:03","14:50","15:29","15:57","16:20","16:48","17:14","17:38","18:02","18:28","18:55","19:31","20:01","20:38","21:17","21:54"];
+const GO_K = ["07:02","07:10","07:21","07:33","07:40","07:48","07:55","07:59","08:04","08:11","08:16","08:19","08:30","08:32","08:40","08:42","08:48","08:53","08:58","09:12","09:15","09:25","09:33","09:37","09:48","09:54","10:09","10:15","10:24","10:44","10:56","11:15","11:24","11:44","11:57","12:15","12:24","12:44","12:57","13:15","13:24","13:44","13:55","14:15","14:24","14:44","14:57","15:15","15:24","15:44","15:56","16:13","16:25","16:33","16:39","16:49","16:57","17:07","17:13","17:20","17:28","17:39","17:44","17:47","18:06","18:16","18:25","18:43","18:49","19:09","19:14","19:19","19:37","19:47","19:54","19:59","20:19","20:27","20:45","20:56","21:07","21:19","21:41","21:48"];
+const GO_R = ["07:05","07:22","07:40","07:58","08:16","08:34","08:52","09:10","09:28","09:46","10:04","10:22","10:40","10:58","11:16","11:34","11:52","12:10","12:28","12:46","13:04","13:22","13:40","13:58","14:16","14:34","14:52","15:10","15:28","15:46","16:04","16:22","16:40","16:58","17:16","17:34","17:52","18:10","18:28","18:46","19:04","19:22","19:40","20:02","20:24","20:53","21:32"];
+const BK_19 = ["06:40","06:56","07:17","07:43","08:05","08:36","09:10","09:45","10:20","11:02","11:46","12:28","13:03","13:39","14:11","14:43","15:25","16:06","16:35","16:59","17:21","17:50","18:17","18:42","19:09","19:34","20:00","20:22","20:55","21:36","22:13","23:00"];
+const BK_UMI = ["06:37","06:54","07:10","07:28","07:43","08:03","08:19","08:37","08:56","09:19","09:48","10:11","10:44","11:06","11:49","12:11","12:58","13:22","13:54","14:19","14:46","15:22","15:47","16:15","16:36","17:07","17:28","17:50","18:13","18:35","19:06","19:38","20:15","20:49","21:38"];
+
+let dayType = "weekday";
+function toMin(s){ const p=s.split(":").map(Number); return p[0]*60+p[1]; }
+function fmtDiff(d){ if(d<0)return"発済"; if(d<60)return d+"分後"; const h=Math.floor(d/60),m=d%60; return m>0?h+"時間"+m+"分後":h+"時間後"; }
+function getDayType(){ const d=new Date().getDay(); if(d===0||d===6)return"weekend"; return"weekday"; }
+function renderChips(elId, list){
+  const el = document.getElementById(elId);
+  if(!el) return;
+  const now = new Date();
+  const nowM = now.getHours()*60+now.getMinutes();
+  const endM = nowM+120;
+  const upcoming = list.filter(t=>{ const m=toMin(t); return m>=nowM && m<=endM; });
+  if(!upcoming.length){ el.innerHTML='<span class="empty">2時間以内なし</span>'; return; }
+  el.innerHTML = upcoming.map((t,i)=>{
+    const diff = toMin(t)-nowM;
+    const cls = i===0 ? 'dep-chip now' : 'dep-chip';
+    const label = i===0 ? `${t}（${fmtDiff(diff)}）` : t;
+    return `<span class="${cls}">${label}</span>`;
+  }).join('');
+}
+function update(){
+  const now = new Date();
+  const hh = String(now.getHours()).padStart(2,'0');
+  const mm = String(now.getMinutes()).padStart(2,'0');
+  document.getElementById('clock').textContent = hh+':'+mm;
+  dayType = getDayType();
+  document.getElementById('dayBadge').textContent = dayType==="weekend" ? "土日(参考)" : "平日";
+  renderChips('go-b-deps', GO_B);
+  renderChips('go-k-deps', GO_K);
+  renderChips('go-r-deps', GO_R);
+  renderChips('bk-19-deps', BK_19);
+  renderChips('bk-umi-deps', BK_UMI);
+  const nowM = now.getHours()*60+now.getMinutes();
+  const nextB = GO_B.find(t=>toMin(t)>=nowM);
+  document.getElementById('go-b-t1').textContent = nextB || "--:--";
+}
+function showDir(dir){
+  document.querySelectorAll('.dir-tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('panel-'+dir).classList.add('active');
+}
+update();
+setInterval(update, 30000);
+</script>
+</body>
+</html>
