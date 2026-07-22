@@ -2,216 +2,401 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="虹の広場ナビ">
-<title>虹の広場ルートナビ</title>
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#f5f5f7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+<meta name="format-detection" content="telephone=no">
+<title>虹の広場ナビ</title>
 <style>
-* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-body { font-family:-apple-system,'Hiragino Sans',sans-serif; background:#eef1f5; color:#222; padding-bottom:40px; }
-.header { background:linear-gradient(135deg,#c0392b,#e74c3c,#f39c12); color:#fff; padding:18px 20px; text-align:center; position:sticky; top:0; z-index:20; box-shadow:0 2px 10px rgba(0,0,0,.15); }
-.header .title { font-size:20px; font-weight:800; letter-spacing:1px; }
-.header .sub { font-size:12px; opacity:.9; margin-top:2px; }
-.header .clock { font-size:14px; margin-top:4px; }
-.header .day-badge { display:inline-block; background:rgba(255,255,255,.25); padding:2px 10px; border-radius:12px; font-size:12px; margin-left:4px; }
-.dir-tabs { display:flex; position:sticky; top:76px; z-index:19; background:#eef1f5; padding:10px 12px 4px; gap:8px; }
-.dir-tab { flex:1; padding:10px; text-align:center; font-size:15px; font-weight:700; border:none; border-radius:10px 10px 0 0; cursor:pointer; }
-.dir-tab.active { background:#fff; color:#c0392b; box-shadow:0 -2px 6px rgba(0,0,0,.06); }
-.dir-tab:not(.active) { background:#d5dae1; color:#666; }
-.wrap { padding:0 12px; }
-.panel { display:none; }
-.panel.active { display:block; }
-.route-card { background:#fff; border-radius:12px; margin-bottom:14px; overflow:hidden; box-shadow:0 1px 4px rgba(0,0,0,.06); }
-.route-head { padding:12px 16px; display:flex; align-items:center; justify-content:space-between; cursor:pointer; }
-.route-name { font-size:15px; font-weight:700; }
-.route-tag { font-size:11px; padding:2px 8px; border-radius:10px; color:#fff; margin-left:8px; }
-.tag-fast { background:#27ae60; }
-.tag-alt { background:#2e86c1; }
-.tag-walk { background:#e67e22; }
-.route-meta { font-size:12px; color:#888; }
-.route-body { padding:0 16px 14px; }
-.next-dep { background:#fef9e7; border-radius:8px; padding:10px 12px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center; }
-.next-dep .lbl { font-size:11px; color:#999; }
-.next-dep .val { font-size:22px; font-weight:800; color:#c0392b; }
-.next-dep .diff { font-size:13px; font-weight:600; padding:3px 9px; border-radius:14px; }
-.diff.urgent { color:#e74c3c; background:#fdecea; }
-.diff.soon { color:#e67e22; background:#fef5e7; }
-.diff.normal { color:#555; background:#f0f0f0; }
-.steps { border-left:3px solid #eee; margin-left:6px; padding-left:14px; }
-.step { padding:6px 0; font-size:13px; position:relative; }
-.step::before { content:''; position:absolute; left:-20px; top:11px; width:9px; height:9px; border-radius:50%; background:#e74c3c; }
-.step .st-time { font-weight:700; color:#c0392b; }
-.step .st-mode { color:#666; }
-.step .st-place { font-weight:600; }
-.deps-list { margin-top:8px; }
-.deps-title { font-size:11px; color:#999; margin-bottom:4px; }
-.dep-chips { display:flex; flex-wrap:wrap; gap:6px; }
-.dep-chip { font-size:13px; padding:4px 9px; border-radius:8px; background:#f0f3f7; font-weight:600; }
-.dep-chip.now { background:#c0392b; color:#fff; }
-.empty { color:#999; font-size:13px; padding:8px 0; }
-.note { font-size:10px; color:#999; text-align:center; margin:16px 12px 0; line-height:1.7; }
-.total-time { font-size:12px; color:#27ae60; font-weight:700; }
+
+:root{
+  color-scheme:light dark;
+  --bg:#f5f5f7;--surface:rgba(255,255,255,.86);--surface-solid:#ffffff;
+  --surface-2:#ededf2;--text:#1d1d1f;--sub:#6e6e73;--muted:#8e8e93;
+  --line:rgba(60,60,67,.16);--blue:#007aff;--blue-soft:rgba(0,122,255,.10);
+  --green:#34c759;--orange:#ff9500;--red:#ff3b30;--purple:#5856d6;
+  --shadow:0 18px 50px rgba(0,0,0,.08),0 2px 10px rgba(0,0,0,.04);
+  --radius:24px;--radius-sm:16px;
+}
+@media(prefers-color-scheme:dark){:root{
+  --bg:#000000;--surface:rgba(28,28,30,.88);--surface-solid:#1c1c1e;
+  --surface-2:#2c2c2e;--text:#f5f5f7;--sub:#a1a1a6;--muted:#8e8e93;
+  --line:rgba(235,235,245,.18);--blue:#0a84ff;--blue-soft:rgba(10,132,255,.17);
+  --green:#30d158;--orange:#ff9f0a;--red:#ff453a;--purple:#5e5ce6;
+  --shadow:0 18px 50px rgba(0,0,0,.38),0 2px 10px rgba(0,0,0,.24);
+}}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{background:var(--bg)}
+body{
+  min-height:100vh;color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Display","Hiragino Sans","Noto Sans JP",sans-serif;
+  -webkit-font-smoothing:antialiased;background:
+    radial-gradient(circle at 8% -5%,rgba(88,86,214,.16),transparent 30%),
+    radial-gradient(circle at 92% 0%,rgba(0,122,255,.13),transparent 28%),var(--bg);
+  padding-bottom:calc(42px + env(safe-area-inset-bottom));
+}
+button,input{font:inherit}
+.rainbow{height:4px;background:linear-gradient(90deg,#ff3b30,#ff9500,#ffcc00,#34c759,#007aff,#5856d6);opacity:.92}
+header,.tabs,section{width:min(100%,780px);margin-inline:auto}
+header{
+  padding:calc(22px + env(safe-area-inset-top)) 20px 16px;display:flex;align-items:center;gap:14px;flex-wrap:wrap
+}
+.brand{display:flex;align-items:center;gap:13px;min-width:0}
+.appicon{
+  width:52px;height:52px;border-radius:17px;display:grid;place-items:center;font-size:28px;flex:0 0 auto;
+  background:linear-gradient(145deg,rgba(255,255,255,.98),rgba(244,244,248,.72));
+  border:1px solid rgba(255,255,255,.72);box-shadow:0 10px 30px rgba(0,0,0,.10)
+}
+@media(prefers-color-scheme:dark){.appicon{background:linear-gradient(145deg,#343438,#1f1f22);border-color:rgba(255,255,255,.08)}}
+.brandcopy{min-width:0}.eyebrow{font-size:11px;letter-spacing:.16em;font-weight:760;color:var(--sub);margin-bottom:3px}
+header h1{font-size:25px;line-height:1.12;font-weight:780;letter-spacing:-.035em}
+.headmeta{margin-left:auto;display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+#daybadge{font-size:12px;font-weight:720;padding:6px 10px;border-radius:999px;background:var(--blue-soft);color:var(--blue);border:1px solid rgba(0,122,255,.16)}
+#clock{font-size:13px;color:var(--sub);font-variant-numeric:tabular-nums;font-weight:650}
+.tabs{display:flex;gap:0;padding:0 20px 18px}
+.tab{
+  appearance:none;-webkit-appearance:none;flex:1;text-align:center;padding:12px 0;border:0;background:var(--surface-2);color:var(--sub);
+  font-weight:720;font-size:16px;cursor:pointer;user-select:none;transition:transform .12s ease,background .18s ease,color .18s ease;box-shadow:inset 0 0 0 1px var(--line)
+}
+.tab:first-child{border-radius:14px 0 0 14px}.tab:last-child{border-radius:0 14px 14px 0}.tab:active{transform:scale(.985)}
+.tab.on{background:var(--surface-solid);color:var(--text);box-shadow:0 2px 12px rgba(0,0,0,.08),inset 0 0 0 1px var(--line)}
+section{padding:0 20px}
+.pickwrap{margin-bottom:14px}.picklabel{font-size:13px;color:var(--sub);margin:0 2px 8px;font-weight:620}
+.chips{display:flex;gap:9px;overflow-x:auto;padding:1px 2px 7px;-webkit-overflow-scrolling:touch;scrollbar-width:none}.chips::-webkit-scrollbar{display:none}
+.chip{
+  flex:0 0 auto;min-width:76px;padding:10px 13px;border-radius:15px;background:var(--surface);border:1px solid var(--line);text-align:center;cursor:pointer;user-select:none;
+  box-shadow:0 2px 12px rgba(0,0,0,.035);transition:transform .12s ease,border-color .18s ease,background .18s ease
+}
+.chip:active{transform:scale(.97)}.chip.on{background:var(--blue);border-color:var(--blue);box-shadow:0 7px 20px rgba(0,122,255,.22)}
+.chip .ct{font-size:19px;font-weight:780;font-variant-numeric:tabular-nums;letter-spacing:-.02em}.chip.on .ct{color:#fff}
+.chip .cl{font-size:10px;color:var(--sub);margin-top:2px;font-weight:650}.chip.on .cl{color:rgba(255,255,255,.76)}
+.route{
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:18px;margin-bottom:16px;
+  box-shadow:var(--shadow);-webkit-backdrop-filter:saturate(160%) blur(18px);backdrop-filter:saturate(160%) blur(18px);overflow:hidden
+}
+.route h2{font-size:18px;line-height:1.25;margin-bottom:4px;font-weight:760;letter-spacing:-.025em}.route .meta{font-size:13px;color:var(--sub);margin-bottom:14px;line-height:1.45}
+.tl{position:relative;padding-left:22px}.tl::before{content:"";position:absolute;left:6px;top:11px;bottom:12px;width:2px;background:var(--line);border-radius:2px}
+.step{position:relative;padding:9px 0 9px 8px;font-size:14px;line-height:1.55}.step::before{content:"";position:absolute;left:-21px;top:17px;width:12px;height:12px;border-radius:50%;background:var(--muted);box-shadow:0 0 0 4px var(--surface-solid)}
+.step.dep::before{background:var(--blue)}.step.goal::before{background:var(--green)}
+.step b.t{display:inline-block;min-width:52px;font-variant-numeric:tabular-nums;font-size:17px;color:var(--blue);margin-right:7px;font-weight:780;letter-spacing:-.02em}.step.goal b.t{color:var(--green)}
+.step .wait{display:inline-block;color:var(--orange);font-size:12px;margin-left:5px;font-weight:650}
+.total{margin-top:12px;padding:11px 13px;border-radius:14px;background:var(--blue-soft);font-size:13px;color:var(--text);line-height:1.55}.total b{font-size:15px;color:var(--blue)}
+.demerits{margin-top:12px;padding:11px 13px;background:rgba(255,149,0,.08);border:1px solid rgba(255,149,0,.18);border-radius:14px;font-size:12px;line-height:1.75;color:var(--sub)}
+.demerits b{color:var(--orange);font-size:11px;letter-spacing:.04em}.none{color:var(--red);font-size:14px;padding:10px 0;line-height:1.55;font-weight:650}
+.linkout{display:inline-block;margin:9px 7px 0 0;padding:10px 14px;border-radius:12px;background:var(--blue);border:1px solid var(--blue);color:#fff;font-size:13px;font-weight:720;text-decoration:none}
+.minilinks{display:flex;flex-wrap:wrap;gap:8px 16px;margin-top:14px;padding-top:12px;border-top:1px solid var(--line);font-size:12px}.minilinks a{color:var(--blue);text-decoration:none;font-weight:650}
+.sos{margin-top:12px}.sos summary{font-size:13px;color:var(--orange);cursor:pointer;padding:8px 0;font-weight:720;list-style:none}.sos summary::-webkit-details-marker{display:none}.sos summary::after{content:"⌄";float:right;color:var(--sub)}.sos[open] summary::after{content:"⌃"}
+.sos .inner{padding:11px 13px;background:var(--surface-2);border:1px solid var(--line);border-radius:14px;margin-top:5px;font-size:13px;line-height:1.75}.sos .inner b{color:var(--blue)}.sos .inner a{color:var(--blue);text-decoration:none;font-weight:650}
+.notice{background:rgba(88,86,214,.09);border:1px solid rgba(88,86,214,.20);border-radius:17px;padding:12px 14px;font-size:12px;line-height:1.75;color:var(--sub);margin-bottom:15px}.notice b{color:var(--purple)}.notice a{color:var(--blue);text-decoration:none;font-weight:650}
+details.debug{margin:9px 0 16px;border-top:1px solid var(--line);padding-top:13px}details.debug summary{font-size:13px;color:var(--sub);cursor:pointer;font-weight:650;padding:7px 1px}
+.dbgbox{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:13px;margin-top:8px;font-size:12px;box-shadow:0 6px 22px rgba(0,0,0,.05)}
+.dbgbox input{appearance:none;-webkit-appearance:none;background:var(--surface-2);border:1px solid var(--line);color:var(--text);border-radius:12px;padding:11px;font-size:14px;width:100%;margin:7px 0 10px}
+.dbgbox button{appearance:none;-webkit-appearance:none;padding:10px 12px;border-radius:11px;border:1px solid var(--line);background:var(--surface-2);color:var(--text);font-size:13px;font-weight:700;margin:0 7px 7px 0}.dbgbox button:first-child{background:var(--blue);border-color:var(--blue);color:#fff}
+#dbglog{white-space:pre-wrap;overflow-wrap:anywhere;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;color:var(--blue);margin-top:8px;line-height:1.7}
+.fallback{margin-top:2px}.fallback p{font-size:13px;line-height:1.7;color:var(--sub)}
+@media(max-width:420px){header{padding-left:16px;padding-right:16px}.tabs,section{padding-left:16px;padding-right:16px}.appicon{width:48px;height:48px;border-radius:15px}.brandcopy .eyebrow{font-size:10px}header h1{font-size:23px}.headmeta{width:100%;margin-left:61px;justify-content:flex-start}.route{padding:16px;border-radius:21px}.step{font-size:13px}.step b.t{min-width:49px;font-size:16px}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+
 </style>
 </head>
 <body>
-<div class="header">
-  <div class="title">🌈 虹の広場ナビ</div>
-  <div class="sub">豊洲一丁目 ⇄ 総合レクリエーション公園</div>
-  <div class="clock"><span id="clock">--:--</span><span class="day-badge" id="dayBadge">--</span></div>
+<div class="rainbow"></div>
+<header>
+  <div class="brand"><div class="appicon" aria-hidden="true">🌈</div><div class="brandcopy"><div class="eyebrow">TOYOSU → NISHIKASAI</div><h1>虹の広場ナビ</h1></div></div>
+  <div class="headmeta"><span id="daybadge">--</span><span id="clock">--:--</span></div>
+</header>
+<div class="tabs" role="tablist" aria-label="行き帰り">
+  <button type="button" class="tab on" id="tabGo" onclick="setTab('go')" role="tab" aria-selected="true">行き</button>
+  <button type="button" class="tab" id="tabBack" onclick="setTab('back')" role="tab" aria-selected="false">帰り</button>
 </div>
-
-<div class="dir-tabs">
-  <button class="dir-tab active" onclick="showDir('go')">🚉 行き</button>
-  <button class="dir-tab" onclick="showDir('back')">🏠 帰り</button>
-</div>
-
-<div class="wrap">
-  <div class="panel active" id="panel-go">
-    <div class="route-card">
-      <div class="route-head">
-        <div><span class="route-name">門仲経由</span><span class="route-tag tag-fast">最速</span></div>
-        <div class="route-meta total-time">約35分</div>
-      </div>
-      <div class="route-body">
-        <div class="steps">
-          <div class="step"><span class="st-time" id="go-b-t1">--:--</span> <span class="st-place">豊洲一丁目</span> <span class="st-mode">🚌門19</span></div>
-          <div class="step"><span class="st-mode">→ 門前仲町（約8分）</span></div>
-          <div class="step"><span class="st-mode">🚇東西線 → 西葛西（約12分）</span></div>
-          <div class="step"><span class="st-mode">🚶 虹の広場（徒歩7分）</span></div>
-        </div>
-        <div class="deps-list">
-          <div class="deps-title">▼ 豊洲一丁目発 門19（門前仲町方面）2時間以内</div>
-          <div class="dep-chips" id="go-b-deps"></div>
-        </div>
-      </div>
-    </div>
-
-    <div class="route-card">
-      <div class="route-head">
-        <div><span class="route-name">越中島・京葉線経由</span><span class="route-tag tag-alt">景色◎</span></div>
-        <div class="route-meta total-time">約40分</div>
-      </div>
-      <div class="route-body">
-        <div class="steps">
-          <div class="step"><span class="st-place">豊洲一丁目</span> <span class="st-mode">🚌門19 → 越中島（約5分）</span></div>
-          <div class="step"><span class="st-mode">🚃京葉線 → 葛西臨海公園（約11分）</span></div>
-          <div class="step"><span class="st-mode">🚌臨海28 → 総合レク公園前（約5分）</span></div>
-        </div>
-        <div class="deps-list">
-          <div class="deps-title">▼ 越中島発 京葉線・蘇我方面（葛西臨海公園行）2時間以内</div>
-          <div class="dep-chips" id="go-k-deps"></div>
-        </div>
-        <div class="deps-list">
-          <div class="deps-title">▼ 葛西臨海公園駅発 臨海28（総合レク公園前）2時間以内</div>
-          <div class="dep-chips" id="go-r-deps"></div>
-        </div>
-      </div>
-    </div>
-
-    <div class="route-card">
-      <div class="route-head">
-        <div><span class="route-name">乗り遅れ→徒歩リカバリー</span><span class="route-tag tag-walk">保険</span></div>
-      </div>
-      <div class="route-body">
-        <div class="empty">豊洲一丁目で門19に乗り遅れたら、都立三商前まで歩いて（約10分）門19か海01を拾う。下の帰りタブの海01時刻も参照。</div>
-      </div>
-    </div>
-  </div>
-
-  <div class="panel" id="panel-back">
-    <div class="route-card">
-      <div class="route-head">
-        <div><span class="route-name">西葛西→門仲→門19</span><span class="route-tag tag-fast">推奨</span></div>
-        <div class="route-meta total-time">約30分</div>
-      </div>
-      <div class="route-body">
-        <div class="steps">
-          <div class="step"><span class="st-mode">🚶 虹の広場 → 西葛西駅（徒歩7分）</span></div>
-          <div class="step"><span class="st-mode">🚇東西線 → 門前仲町（約12分）</span></div>
-          <div class="step"><span class="st-mode">🚌門19 → 豊洲一丁目（約8分）</span></div>
-        </div>
-        <div class="deps-list">
-          <div class="deps-title">▼ 門前仲町発 門19（東京ビッグサイト方面＝豊洲一丁目行）2時間以内</div>
-          <div class="dep-chips" id="bk-19-deps"></div>
-        </div>
-      </div>
-    </div>
-
-    <div class="route-card">
-      <div class="route-head">
-        <div><span class="route-name">門仲→海01（都立三商方面）</span><span class="route-tag tag-alt">次善</span></div>
-      </div>
-      <div class="route-body">
-        <div class="steps">
-          <div class="step"><span class="st-mode">🚇東西線 → 門前仲町</span></div>
-          <div class="step"><span class="st-mode">🚌海01 → 都立三商前 → 豊洲方面</span></div>
-        </div>
-        <div class="deps-list">
-          <div class="deps-title">▼ 門前仲町発 海01（越中島方面）2時間以内</div>
-          <div class="dep-chips" id="bk-umi-deps"></div>
-        </div>
-        <div class="empty" style="margin-top:8px">※門19に乗れるなら門19が優先。海01は都立三商前・越中島方面。</div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="note">
-  出典：都営バス公式(tobus.jp)/NAVITIME/駅探（平日ダイヤ）<br>
-  時刻は目安。道路混雑・接続により変動あり<br>
-  ⚡ 7/21〜7/27 フォーミュラE交通規制で門19エリア遅延の可能性
-</div>
-
+<section id="noticeArea"></section>
+<section id="content">
+  <div class="route fallback"><h2>🅰️ 門前仲町ルート</h2><div class="meta">門19 → 東西線（西葛西停車）→ 徒歩7分</div><p>Safariで開くと、現在時刻から次のバス・電車・到着見込みを自動計算します。</p></div>
+  <div class="route fallback"><h2>🅱️ 越中島・葛西臨海公園ルート</h2><div class="meta">門19 → 京葉線各停 → 西葛20乙 → 西葛西駅前 → 徒歩7分</div><p>第2ルート、乗換待ち、所要時間、公式接近情報へのリンクも実装済みです。</p></div>
+  <div class="route fallback"><h2>🏠 帰り</h2><div class="meta">東西線 → 門19</div><p>Safariで開くと、門19の候補便から西葛西駅を出る時刻を逆算します。</p></div>
+</section>
+<section>
+<details class="debug"><summary>設定・デバッグ・情報源</summary>
+<div class="dbgbox"><input type="datetime-local" id="dbgdt">
+<div><button type="button" onclick="applyDebug()">この日時で表示</button><button type="button" onclick="clearDebug()">現在時刻に戻す</button></div>
+<div id="dbglog"></div></div></details>
+</section>
 <script>
-const GO_B = ["07:03","07:19","07:35","07:50","08:06","08:22","08:37","08:54","09:15","09:32","10:06","10:38","11:25","12:19","13:09","14:03","14:50","15:29","15:57","16:20","16:48","17:14","17:38","18:02","18:28","18:55","19:31","20:01","20:38","21:17","21:54"];
-const GO_K = ["07:02","07:10","07:21","07:33","07:40","07:48","07:55","07:59","08:04","08:11","08:16","08:19","08:30","08:32","08:40","08:42","08:48","08:53","08:58","09:12","09:15","09:25","09:33","09:37","09:48","09:54","10:09","10:15","10:24","10:44","10:56","11:15","11:24","11:44","11:57","12:15","12:24","12:44","12:57","13:15","13:24","13:44","13:55","14:15","14:24","14:44","14:57","15:15","15:24","15:44","15:56","16:13","16:25","16:33","16:39","16:49","16:57","17:07","17:13","17:20","17:28","17:39","17:44","17:47","18:06","18:16","18:25","18:43","18:49","19:09","19:14","19:19","19:37","19:47","19:54","19:59","20:19","20:27","20:45","20:56","21:07","21:19","21:41","21:48"];
-const GO_R = ["07:05","07:22","07:40","07:58","08:16","08:34","08:52","09:10","09:28","09:46","10:04","10:22","10:40","10:58","11:16","11:34","11:52","12:10","12:28","12:46","13:04","13:22","13:40","13:58","14:16","14:34","14:52","15:10","15:28","15:46","16:04","16:22","16:40","16:58","17:16","17:34","17:52","18:10","18:28","18:46","19:04","19:22","19:40","20:02","20:24","20:53","21:32"];
-const BK_19 = ["06:40","06:56","07:17","07:43","08:05","08:36","09:10","09:45","10:20","11:02","11:46","12:28","13:03","13:39","14:11","14:43","15:25","16:06","16:35","16:59","17:21","17:50","18:17","18:42","19:09","19:34","20:00","20:22","20:55","21:36","22:13","23:00"];
-const BK_UMI = ["06:37","06:54","07:10","07:28","07:43","08:03","08:19","08:37","08:56","09:19","09:48","10:11","10:44","11:06","11:49","12:11","12:58","13:22","13:54","14:19","14:46","15:22","15:47","16:15","16:36","17:07","17:28","17:50","18:13","18:35","19:06","19:38","20:15","20:49","21:38"];
+"use strict";
+const DATA={
+goBus:{
+weekday:["07:03","07:19","07:35","07:50","08:06","08:22","08:37","08:54","09:15","09:32","10:06","10:38","11:25","12:19","13:09","14:03","14:50","15:29","15:57","16:20","16:48","17:14","17:38","18:02","18:28","18:55","19:31","20:01","20:38","21:17","21:54"],
+saturday:["07:02","07:27","07:49","08:20","08:53","09:27","10:02","10:44","11:28","12:10","12:45","13:21","13:53","14:25","15:07","15:48","16:17","16:41","17:03","17:32","17:59","18:24","18:53","19:18","19:44","20:06","20:39","21:20","21:57"],
+holiday:["07:10","07:35","08:02","08:34","09:04","09:36","10:05","10:34","11:09","11:42","12:15","12:48","13:21","13:56","14:27","15:04","15:43","16:20","16:50","17:21","17:44","18:09","18:43","19:22","20:00","20:41","21:19","21:57"]
+},
+/* 海01 都立三商前→門前仲町行き（tobus公式 stopid=1050 routecode=18） */
+goKai01:{
+weekday:["07:04","07:09","07:13","07:17","07:21","07:25","07:29","07:33","07:38","07:43","07:49","07:55","08:01","08:07","08:14","08:21","08:28","08:35","08:42","08:49","08:56","09:03","09:11","09:19","09:27","09:35","09:43","09:52","10:01","10:11","10:21","10:32","10:43","10:54","11:05","11:15","11:25","11:35","11:45","11:55","12:05","12:15","12:25","12:35","12:45","12:55","13:05","13:15","13:25","13:35","13:45","13:54","14:02","14:10","14:18","14:26","14:34","14:42","14:50","14:58","15:06","15:15","15:24","15:32","15:40","15:48","15:56","16:04","16:12","16:19","16:26","16:33","16:40","16:47","16:54","17:01","17:08","17:15","17:23","17:31","17:39","17:47","17:55","18:03","18:11","18:20","18:29","18:38","18:46","18:56","19:06","19:14","19:23","19:33","19:41","19:50","19:59","20:07","20:17","20:29","20:40","20:53","21:06","21:19","21:34","21:49","22:06"],
+saturday:["07:06","07:17","07:29","07:41","07:51","08:03","08:14","08:24","08:36","08:45","08:58","09:07","09:19","09:30","09:40","09:53","10:04","10:15","10:24","10:35","10:45","10:55","11:04","11:15","11:24","11:35","11:44","11:56","12:06","12:17","12:29","12:40","12:50","13:02","13:13","13:26","13:37","13:50","14:02","14:14","14:25","14:38","14:50","15:02","15:13","15:26","15:38","15:50","16:01","16:08","16:23","16:34","16:45","16:56","17:07","17:18","17:29","17:40","17:51","18:02","18:13","18:24","18:36","18:48","19:00","19:13","19:26","19:39","19:52","20:08","20:24","20:42","20:59","21:16","21:33","21:50","22:07"],
+holiday:["07:02","07:20","07:38","07:54","08:10","08:25","08:40","08:55","09:09","09:22","09:35","09:48","09:59","10:12","10:23","10:36","10:47","11:00","11:11","11:24","11:35","11:48","11:59","12:13","12:26","12:38","12:50","13:02","13:14","13:26","13:38","13:51","14:04","14:17","14:30","14:43","14:56","15:09","15:21","15:33","15:43","15:56","16:07","16:18","16:29","16:40","16:51","17:02","17:12","17:22","17:32","17:42","17:53","18:04","18:16","18:28","18:40","18:54","19:08","19:22","19:36","19:51","20:06","20:21","20:35","20:53","21:11","21:30","21:48","22:08"]
+},
+/* 海01 門前仲町発→テレポート方面（帰り用・平土休） */
+backKai01:{
+weekday:["06:40","06:50","06:59","07:08","07:17","07:22","07:26","07:30","07:34","07:38","07:42","07:46","07:51","07:56","08:02","08:08","08:14","08:20","08:27","08:34","08:41","08:48","08:55","09:02","09:09","09:16","09:24","09:32","09:40","09:48","09:56","10:05","10:14","10:24","10:34","10:45","10:56","11:07","11:18","11:28","11:38","11:48","11:58","12:08","12:18","12:28","12:38","12:48","12:58","13:08","13:18","13:28","13:38","13:48","13:58","14:07","14:15","14:23","14:31","14:39","14:47","14:55","15:03","15:11","15:19","15:28","15:37","15:45","15:53","16:01","16:09","16:17","16:25","16:32","16:39","16:46","16:53","17:00","17:07","17:14","17:21","17:28","17:36","17:44","17:52","18:00","18:08","18:16","18:24","18:33","18:42","18:51","18:59","19:09","19:19","19:27","19:36","19:46","19:54","20:03","20:12","20:20","20:30","20:42","20:53","21:06","21:19","21:32","21:47","22:02","22:20"],
+saturday:["06:40","06:53","07:05","07:18","07:30","07:42","07:53","08:04","08:15","08:26","08:37","08:48","08:59","09:10","09:21","09:32","09:43","09:54","10:06","10:17","10:28","10:38","10:48","10:58","11:08","11:18","11:28","11:38","11:48","11:58","12:09","12:20","12:31","12:42","12:53","13:04","13:15","13:27","13:39","13:51","14:03","14:15","14:27","14:39","14:51","15:03","15:15","15:27","15:39","15:51","16:03","16:14","16:25","16:36","16:47","16:58","17:09","17:20","17:31","17:42","17:53","18:04","18:15","18:26","18:37","18:49","19:01","19:13","19:26","19:39","19:52","20:06","20:21","20:37","20:55","21:12","21:29","21:46","22:03","22:20"],
+holiday:["06:40","06:57","07:14","07:32","07:50","08:06","08:22","08:37","08:52","09:07","09:21","09:34","09:47","10:00","10:12","10:24","10:36","10:48","11:00","11:12","11:24","11:36","11:48","12:00","12:12","12:25","12:38","12:51","13:03","13:15","13:27","13:39","13:51","14:04","14:17","14:30","14:43","14:56","15:09","15:22","15:34","15:46","15:58","16:09","16:20","16:31","16:42","16:53","17:04","17:15","17:25","17:35","17:45","17:55","18:06","18:17","18:29","18:41","18:53","19:07","19:21","19:35","19:49","20:04","20:19","20:34","20:48","21:06","21:24","21:43","22:01","22:20"]
+},
+monzenMetro:{
+weekday:["05:26","05:37","05:48","06:00","06:09","06:17","06:25","06:36","06:43","06:47","06:58","07:04","07:09","07:17","07:20","07:27","07:30","07:33","07:38","07:42","07:45","07:51","07:54","07:59","08:02","08:08","08:12","08:18","08:22","08:28","08:31","08:33","08:39","08:42","08:45","08:51","08:53","08:58","09:01","09:05","09:08","09:10","09:16","09:19","09:21","09:26","09:29","09:32","09:35","09:42","09:44","09:47","09:52","09:54","09:57","09:59","10:04","10:06","10:09","10:14","10:16","10:18","10:23","10:25","10:28","10:30","10:36","10:39","10:47","10:50","10:53","11:01","11:06","11:15","11:20","11:30","11:35","11:45","11:50","12:00","12:05","12:15","12:20","12:30","12:35","12:45","12:50","13:00","13:05","13:15","13:20","13:30","13:35","13:45","13:50","14:00","14:05","14:15","14:20","14:30","14:35","14:45","14:50","15:00","15:05","15:15","15:20","15:30","15:35","15:45","15:50","16:00","16:05","16:15","16:20","16:30","16:35","16:43","16:47","16:51","16:56","17:03","17:06","17:10","17:18","17:22","17:25","17:32","17:36","17:41","17:46","17:52","17:56","18:02","18:05","18:11","18:14","18:17","18:23","18:26","18:32","18:35","18:41","18:45","18:51","18:55","19:02","19:05","19:11","19:17","19:20","19:24","19:31","19:34","19:37","19:43","19:46","19:52","19:57","20:04","20:07","20:11","20:19","20:23","20:29","20:33","20:37","20:43","20:46","20:54","20:59","21:07","21:11","21:19","21:24","21:33","21:37","21:44","21:47","21:54","21:58","22:06","22:11","22:18","22:22","22:31","22:35","22:42","22:47","22:59","23:05","23:10","23:19","23:23","23:29","23:38","23:43","23:47","23:51","23:56"],
+holiday:[]
+},
+echujimaKeiyo:{
+weekday:["04:59","05:15","05:39","05:55","06:07","06:15","06:26","06:30","06:40","06:46","06:53","07:02","07:10","07:13","07:21","07:28","07:33","07:36","07:40","07:48","07:52","07:55","07:59","08:04","08:07","08:11","08:13","08:16","08:19","08:21","08:27","08:30","08:32","08:37","08:40","08:42","08:45","08:48","08:53","08:55","08:58","09:09","09:12","09:15","09:22","09:25","09:33","09:37","09:48","09:50","09:54","10:09","10:12","10:15","10:24","10:30","10:44","10:50","10:56","11:10","11:15","11:24","11:30","11:44","11:50","11:57","12:10","12:15","12:24","12:30","12:44","12:50","12:57","13:10","13:15","13:24","13:30","13:44","13:50","13:55","14:10","14:15","14:24","14:30","14:44","14:50","14:57","15:10","15:15","15:24","15:30","15:44","15:49","15:56","16:10","16:13","16:25","16:29","16:33","16:39","16:45","16:49","16:57","17:00","17:07","17:13","17:20","17:24","17:28","17:36","17:39","17:44","17:47","17:51","17:55","17:57","18:06","18:09","18:16","18:21","18:25","18:30","18:36","18:39","18:43","18:49","18:55","18:59","19:06","19:09","19:14","19:19","19:25","19:30","19:37","19:40","19:47","19:50","19:54","19:59","20:07","20:19","20:22","20:27","20:31","20:45","20:48","20:56","21:07","21:11","21:19","21:29","21:34","21:41","21:48","21:53","21:56","22:07","22:12","22:16","22:24","22:27","22:36","22:41","22:45","22:56","23:02","23:08","23:21","23:34","23:37","23:52","00:10","00:28"],
+holiday:["04:59","05:15","05:39","05:53","06:10","06:20","06:29","06:39","06:45","06:49","06:56","07:01","07:08","07:11","07:21","07:23","07:32","07:40","07:45","07:50","07:56","07:59","08:04","08:07","08:11","08:18","08:22","08:25","08:30","08:34","08:38","08:45","08:50","08:53","08:59","09:10","09:15","09:22","09:27","09:32","09:44","09:49","09:52","09:57","10:10","10:16","10:29","10:32","10:45","10:53","10:58","11:10","11:17","11:29","11:32","11:44","11:53","12:02","12:10","12:17","12:29","12:32","12:44","12:53","12:58","13:10","13:17","13:28","13:32","13:44","13:53","13:58","14:10","14:17","14:29","14:32","14:44","14:53","15:02","15:10","15:18","15:29","15:32","15:44","15:53","16:02","16:07","16:11","16:17","16:28","16:33","16:38","16:46","16:56","17:00","17:07","17:11","17:15","17:24","17:28","17:36","17:45","17:50","17:53","17:58","18:06","18:11","18:15","18:24","18:32","18:36","18:42","18:47","18:53","18:59","19:06","19:12","19:17","19:24","19:28","19:36","19:40","19:44","19:49","19:59","20:02","20:06","20:14","20:24","20:31","20:44","20:47","20:51","21:06","21:10","21:17","21:29","21:32","21:36","21:47","21:53","22:07","22:12","22:23","22:28","22:32","22:35","22:41","22:45","22:56","23:02","23:09","23:21","23:34","23:37","23:52","00:10","00:28"]
+},
+west20B:{
+weekday:["05:45","06:33","06:46","06:57","07:08","07:21","07:31","07:42","07:56","08:15","08:26","08:43","09:04","09:25","09:47","10:12","10:35","11:00","11:25","11:53","12:11","12:40","12:57","13:26","13:43","14:10","14:30","14:52","15:15","15:37","15:58","16:16","16:36","17:01","17:23","17:49","18:08","18:32","18:52","19:15","19:35","19:59","20:21","20:45","21:07","21:32","21:50","22:13"],
+saturday:["05:45","06:35","06:49","07:01","07:14","07:27","07:38","07:50","08:07","08:18","08:32","08:45","09:02","09:19","09:46","10:03","10:25","10:49","11:06","11:28","11:50","12:10","12:29","12:50","13:11","13:34","13:53","14:15","14:37","14:59","15:22","15:44","16:08","16:29","16:53","17:14","17:38","18:00","18:21","18:45","19:07","19:29","19:49","20:09","20:32","20:52","21:13","21:33","21:51","22:13"],
+holiday:["06:23","07:04","07:22","07:42","08:04","08:23","08:47","09:08","09:30","09:52","10:13","10:35","10:55","11:23","11:47","12:09","12:36","13:02","13:24","13:48","14:13","14:35","15:02","15:22","15:45","16:09","16:33","16:53","17:08","17:28","17:45","18:06","18:30","18:58","19:40","20:06","20:48","21:30","22:13"]
+},
+nishikasaiMetro:{
+weekday:["05:16","05:30","05:39","05:51","06:00","06:09","06:12","06:19","06:23","06:26","06:29","06:33","06:36","06:39","06:42","06:45","06:47","06:50","06:53","06:55","06:58","07:01","07:04","07:07","07:10","07:12","07:15","07:18","07:20","07:23","07:26","07:29","07:31","07:34","07:36","07:39","07:41","07:43","07:46","07:48","07:50","07:53","07:55","07:57","08:00","08:02","08:04","08:07","08:09","08:11","08:14","08:16","08:18","08:21","08:23","08:25","08:28","08:30","08:32","08:35","08:37","08:40","08:42","08:45","08:47","08:50","08:54","08:57","09:00","09:02","09:05","09:09","09:12","09:15","09:18","09:21","09:24","09:30","09:35","09:42","09:46","09:53","09:58","10:06","10:12","10:20","10:27","10:35","10:42","10:50","10:57","11:05","11:12","11:20","11:27","11:35","11:42","11:50","11:57","12:05","12:12","12:20","12:27","12:35","12:42","12:50","12:57","13:05","13:12","13:20","13:27","13:35","13:42","13:50","13:57","14:05","14:12","14:20","14:27","14:35","14:42","14:50","14:57","15:05","15:12","15:20","15:27","15:35","15:42","15:51","15:58","16:05","16:11","16:15","16:23","16:27","16:36","16:41","16:49","16:56","17:00","17:05","17:12","17:20","17:23","17:30","17:34","17:38","17:42","17:47","17:51","17:57","18:03","18:10","18:13","18:20","18:24","18:28","18:32","18:41","18:45","18:49","18:55","18:58","19:06","19:11","19:18","19:21","19:30","19:33","19:42","19:45","19:48","19:56","20:00","20:08","20:13","20:15","20:21","20:24","20:27","20:34","20:37","20:46","20:51","20:58","21:02","21:06","21:14","21:17","21:20","21:28","21:32","21:36","21:44","21:48","21:53","22:03","22:09","22:13","22:23","22:27","22:32","22:41","22:44","22:50","22:53","22:58","23:06","23:12","23:15","23:21","23:34","23:44","23:57"],
+holiday:[]
+},
+backMon19:{
+weekday:["06:40","06:59","07:19","07:35","07:51","08:06","08:23","08:40","08:56","09:12","09:34","09:51","10:25","10:57","11:44","12:38","13:28","14:22","15:09","15:48","16:16","16:39","17:07","17:33","17:57","18:21","18:47","19:11","19:46","20:16","20:53","21:32","22:09","22:45","23:00"],
+saturday:["06:40","06:56","07:17","07:43","08:05","08:36","09:10","09:45","10:20","11:02","11:46","12:28","13:03","13:39","14:11","14:43","15:25","16:06","16:35","16:59","17:21","17:50","18:17","18:42","19:09","19:34","20:00","20:22","20:55","21:36","22:13","23:00"],
+holiday:["06:40","06:56","07:25","07:50","08:17","08:50","09:21","09:52","10:22","10:53","11:26","11:59","12:32","13:05","13:39","14:14","14:45","15:22","16:01","16:38","17:08","17:38","18:01","18:26","18:59","19:38","20:16","20:57","21:34","22:12","23:00"]
+}
+};
+function nthMonday(year,month,n){const d=new Date(year,month-1,1),offset=(8-d.getDay())%7;return 1+offset+(n-1)*7;}
+function equinoxDay(year,isSpring){return Math.floor((isSpring?20.8431:23.2488)+0.242194*(year-1980)-Math.floor((year-1980)/4));}
+function buildJapaneseHolidays(startYear,endYear){
+  const set=new Set(),add=(y,m,d)=>set.add(`${y}-${String(m).padStart(2,"0")}-${String(d).padStart(2,"0")}`);
+  for(let y=startYear;y<=endYear;y++){
+    add(y,1,1);add(y,1,nthMonday(y,1,2));add(y,2,11);if(y>=2020)add(y,2,23);add(y,3,equinoxDay(y,true));
+    add(y,4,29);add(y,5,3);add(y,5,4);add(y,5,5);add(y,7,nthMonday(y,7,3));add(y,8,11);
+    add(y,9,nthMonday(y,9,3));add(y,9,equinoxDay(y,false));add(y,10,nthMonday(y,10,2));add(y,11,3);add(y,11,23);
+  }
+  /* 国民の休日 */
+  for(let y=startYear;y<=endYear;y++)for(let m=0;m<12;m++)for(let d=2;d<=30;d++){
+    const cur=new Date(y,m,d),k=ymd(cur),prev=ymd(new Date(y,m,d-1)),next=ymd(new Date(y,m,d+1));
+    if(!set.has(k)&&set.has(prev)&&set.has(next))set.add(k);
+  }
+  /* 振替休日：日曜の祝日の直後の最初の平日 */
+  const originals=Array.from(set).sort();
+  for(const k of originals){const p=k.split("-").map(Number),d=new Date(p[0],p[1]-1,p[2]);if(d.getDay()===0){let x=new Date(d);do{x.setDate(x.getDate()+1)}while(set.has(ymd(x)));set.add(ymd(x));}}
+  return set;
+}
+const HOLIDAYS=buildJapaneseHolidays(2024,2035);
+const L={
+metroT12:"https://transfer.tokyometro.jp/website/timetable?numbering=T12&direction=0&schedule=weekday",
+metroT12Holiday:"https://transfer.tokyometro.jp/website/timetable?numbering=T12&direction=0&schedule=holiday",
+metroT16:"https://transfer.tokyometro.jp/website/timetable?numbering=T16&direction=1&schedule=weekday",
+metroT16Holiday:"https://transfer.tokyometro.jp/website/timetable?numbering=T16&direction=1&schedule=holiday",
+gmapGo:"https://www.google.com/maps/dir/?api=1&origin="+encodeURIComponent("豊洲一丁目バス停")+"&destination="+encodeURIComponent("虹の広場 江戸川区西葛西7丁目2番")+"&travelmode=transit",
+gmapBack:"https://www.google.com/maps/dir/?api=1&origin="+encodeURIComponent("虹の広場 江戸川区西葛西7丁目2番")+"&destination="+encodeURIComponent("豊洲一丁目バス停")+"&travelmode=transit",
+apMon19:"https://tobus.jp/sp/blsys/approaching?stopcode=1028&ln=ja",
+apMonzen:"https://tobus.jp/sp/blsys/approaching?stopcode=1544&ln=ja",
+apKasaiRinkai:"https://tobus.jp/sp/blsys/approaching?stopcode=2189&ln=ja",
+mon19Go:"https://tobus.jp/sp/blsys/stop/time?ln=ja&poleno=1&routecode=52&stopid=1028&ud=2",
+mon19Back:"https://tobus.jp/sp/blsys/stop/time?ln=ja&poleno=6&routecode=52&stopid=1544",
+west20B:"https://tobus.jp/sp/blsys/stop/time?ln=ja&poleno=2&routecode=57&stopid=2189",
+kai01Go:"https://tobus.jp/sp/blsys/stop/time?ln=ja&poleno=1&stopid=1050&routecode=18&ud=2",
+kai01Back:"https://tobus.jp/sp/blsys/stop/time?ln=ja&poleno=5&stopid=1544&routecode=18",
+jrEcchujima:"https://www.jreast.co.jp/estation/stations/286.html"
+};
+const T={
+mon19ToMonnaka:8,transferMonnaka:15,
+metroMonToNk:12,walkNkToNiji:7,
+mon19ToEcchujima:5,walkEcchBusToSta:12,keiyoToKasai:9,walkKasaiToBus:4,
+busKasaiToNk:12,walkNkBusToNiji:3,
+walkNijiToNk:7,metroNkToMon:12,walkMonStaToBus:5,busMon19Home:8,
+kai01SanshoToMon:5,kai01MonToSansho:7,walkHomeToSansho:5,walkMonBus6ToKai5:3
+};
+function ymd(d){const p=n=>String(n).padStart(2,"0");return d.getFullYear()+"-"+p(d.getMonth()+1)+"-"+p(d.getDate());}
+function serviceDate(n){return new Date(n.getTime()-3*36e5);}
+function getDayType(n){const s=serviceDate(n),d=s.getDay(),h=HOLIDAYS.has(ymd(s));if(d===0||h)return{bus:"holiday",rail:"holiday",label:"休日ダイヤ"};if(d===6)return{bus:"saturday",rail:"holiday",label:"土曜ダイヤ"};return{bus:"weekday",rail:"weekday",label:"平日ダイヤ"};}
+function nowMin(n){let m=n.getHours()*60+n.getMinutes();if(n.getHours()<3)m+=1440;return m;}
+function toM(t){const[a,b]=t.split(":").map(Number);let m=a*60+b;if(a<3)m+=1440;return m;}
+function fmt(m){m=((m%1440)+1440)%1440;return String(Math.floor(m/60)).padStart(2,"0")+":"+String(m%60).padStart(2,"0");}
+function nA(l,mm){for(const t of l){const m=toM(t);if(m>=mm)return m;}return null;}
+function n3(l,mm){const r=[];for(const t of l){const m=toM(t);if(m>=mm){r.push(fmt(m));if(r.length===3)break;}}return r;}
 
-let dayType = "weekday";
-function toMin(s){ const p=s.split(":").map(Number); return p[0]*60+p[1]; }
-function fmtDiff(d){ if(d<0)return"発済"; if(d<60)return d+"分後"; const h=Math.floor(d/60),m=d%60; return m>0?h+"時間"+m+"分後":h+"時間後"; }
-function getDayType(){ const d=new Date().getDay(); if(d===0||d===6)return"weekend"; return"weekday"; }
-function renderChips(elId, list){
-  const el = document.getElementById(elId);
-  if(!el) return;
-  const now = new Date();
-  const nowM = now.getHours()*60+now.getMinutes();
-  const endM = nowM+120;
-  const upcoming = list.filter(t=>{ const m=toMin(t); return m>=nowM && m<=endM; });
-  if(!upcoming.length){ el.innerHTML='<span class="empty">2時間以内なし</span>'; return; }
-  el.innerHTML = upcoming.map((t,i)=>{
-    const diff = toMin(t)-nowM;
-    const cls = i===0 ? 'dep-chip now' : 'dep-chip';
-    const label = i===0 ? `${t}（${fmtDiff(diff)}）` : t;
-    return `<span class="${cls}">${label}</span>`;
-  }).join('');
+function planGoMon(dep,dt){
+  const ba=dep+T.mon19ToMonnaka,sr=ba+T.transferMonnaka;
+  const metro=DATA.monzenMetro[dt.rail];
+  if(!metro||!metro.length)return{dep,ba,sr,miss:true};
+  const md=nA(metro,sr);if(md===null)return{dep,ba,sr,end:true};
+  const nk=md+T.metroMonToNk,g=nk+T.walkNkToNiji;
+  return{dep,ba,sr,md,w:md-sr,nk,g,tot:g-dep};
 }
-function update(){
-  const now = new Date();
-  const hh = String(now.getHours()).padStart(2,'0');
-  const mm = String(now.getMinutes()).padStart(2,'0');
-  document.getElementById('clock').textContent = hh+':'+mm;
-  dayType = getDayType();
-  document.getElementById('dayBadge').textContent = dayType==="weekend" ? "土日(参考)" : "平日";
-  renderChips('go-b-deps', GO_B);
-  renderChips('go-k-deps', GO_K);
-  renderChips('go-r-deps', GO_R);
-  renderChips('bk-19-deps', BK_19);
-  renderChips('bk-umi-deps', BK_UMI);
-  const nowM = now.getHours()*60+now.getMinutes();
-  const nextB = GO_B.find(t=>toMin(t)>=nowM);
-  document.getElementById('go-b-t1').textContent = nextB || "--:--";
+function planGoEcc(dep,dt){
+  const ba=dep+T.mon19ToEcchujima,sa=ba+T.walkEcchBusToSta;
+  const ky=DATA.echujimaKeiyo[dt.rail],kd=nA(ky,sa);
+  if(kd===null)return{dep,ba,sa,end:true};
+  const ka=kd+T.keiyoToKasai,bs=ka+T.walkKasaiToBus;
+  const west=DATA.west20B[dt.bus];
+  if(!west||!west.length)return{dep,ba,sa,kd,wk:kd-sa,ka,bs,rmiss:true};
+  const rd=nA(west,bs);if(rd===null)return{dep,ba,sa,kd,wk:kd-sa,ka,bs,rend:true};
+  const nk=rd+T.busKasaiToNk,g=nk+T.walkNkBusToNiji;
+  return{dep,ba,sa,kd,wk:kd-sa,ka,bs,rd,wr:rd-bs,nk,g,tot:g-dep};
 }
-function showDir(dir){
-  document.querySelectorAll('.dir-tab').forEach(t=>t.classList.remove('active'));
-  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
-  event.target.classList.add('active');
-  document.getElementById('panel-'+dir).classList.add('active');
+function planBack(md,dt){
+  const mn=md+T.metroNkToMon,bs=mn+T.walkMonStaToBus;
+  const bus=DATA.backMon19[dt.bus],bd=nA(bus,bs);
+  if(bd===null)return{md,mn,bs,bend:true};
+  return{md,mn,bs,bd,wb:bd-bs,g:bd+T.busMon19Home};
 }
-update();
-setInterval(update, 30000);
+
+let TAB="go",DBG=null,SELGO=null,SELBACK=null;
+function setTab(t){TAB=t;const go=document.getElementById("tabGo"),back=document.getElementById("tabBack");go.classList.toggle("on",t==="go");back.classList.toggle("on",t==="back");go.setAttribute("aria-selected",t==="go"?"true":"false");back.setAttribute("aria-selected",t==="back"?"true":"false");render();}
+function nowR(){return DBG?new Date(DBG.getTime()):new Date();}
+function pickGo(m){SELGO=m;render();}
+function pickBack(m){SELBACK=m;render();}
+function st(c,t,l,w){return`<div class="step ${c}"><b class="t">${t}</b>${l}${w!=null?`<span class="wait">（待ち${w}分）</span>`:""}</div>`;}
+
+function render(){
+  const now=nowR(),dt=getDayType(now),nm=nowMin(now);
+  document.getElementById("daybadge").textContent=dt.label+(DBG?"・デバッグ":"");
+  document.getElementById("clock").textContent=`${now.getMonth()+1}/${now.getDate()} ${String(now.getHours()).padStart(2,"0")}:${String(now.getMinutes()).padStart(2,"0")}`;
+  const notices=[];
+  if(dt.rail==="holiday")notices.push(`鉄道は土休日ダイヤです（<a href="${L.metroT12Holiday}" target="_blank" rel="noopener noreferrer">門仲→西船橋方面</a> / <a href="${L.metroT16Holiday}" target="_blank" rel="noopener noreferrer">西葛西→中野方面</a>）。`);
+  document.getElementById("noticeArea").innerHTML=notices.length?`<div class="notice">${notices.join("<br>")}</div>`:"";
+  document.getElementById("content").innerHTML=TAB==="go"?renderGo(dt,nm):renderBack(dt,nm);
+  renderDbg(dt,nm);
+}
+
+function renderGo(dt,nm){
+  const list=DATA.goBus[dt.bus]||[];
+  const cands=list.map(toM).filter(m=>m>=nm).slice(0,6);
+  if(!cands.length)return`<div class="route"><div class="none">本日の門19（豊洲一丁目発）は終了または未収録です。</div><div class="minilinks"><a href="${L.apMon19}" target="_blank" rel="noopener noreferrer">🚌 門19接近情報</a><a href="${L.gmapGo}" target="_blank" rel="noopener noreferrer">🗺️ Googleマップ</a></div></div>`;
+  let sel=cands.includes(SELGO)?SELGO:cands[0];
+  let h=`<div class="pickwrap"><div class="picklabel">門19 豊洲一丁目発 — どのバスに乗る？</div><div class="chips">`;
+  for(const m of cands){h+=`<div class="chip${m===sel?" on":""}" onclick="pickGo(${m})"><div class="ct">${fmt(m)}</div><div class="cl">門19</div></div>`;}
+  h+=`</div></div>`;
+
+  /* 🅰️ 門仲ルート */
+  const A=planGoMon(sel,dt);
+  h+=`<div class="route"><h2>🅰️ 門前仲町ルート</h2><div class="meta">門19 → 東西線 → 徒歩7分</div><div class="tl">`;
+  h+=st("dep",fmt(sel),"豊洲一丁目 発（門19）");
+  h+=st("",fmt(A.ba),"門前仲町 バス停 着");
+  if(A.miss){h+=`</div><a class="linkout" href="${L.metroT12}" target="_blank" rel="noopener noreferrer">東西線の土休日時刻表を開く</a><div class="total">${fmt(A.sr)}以降の西葛西停車列車に乗車 → 西葛西約12分＋徒歩7分</div>`;}
+  else if(A.end){h+=st("",fmt(A.sr),"門前仲町 駅")+`</div><div class="none">東西線の本日便なし</div>`;}
+  else{
+    h+=st("",fmt(A.md),"門前仲町 発（東西線・西葛西停車）",A.w);
+    h+=st("",fmt(A.nk),"西葛西 着");
+    h+=st("goal",fmt(A.g),"🌈 虹の広場 着");
+    h+=`</div><div class="total">所要 約${A.tot}分</div>`;
+  }
+  h+=`<div class="demerits"><b>⚠️ デメリット</b><br>・門前仲町駅の乗換が面倒（地上→地下）<br>・西葛西駅が混雑（特に改札〜地上）<br>・東西線は座れないことが多い<br>・最後の徒歩7分が暑い</div>`;
+  h+=sosGo(dt,nm,sel);
+  h+=`<div class="minilinks"><a href="${L.apMon19}" target="_blank" rel="noopener noreferrer">🚌 門19接近</a><a href="${L.gmapGo}" target="_blank" rel="noopener noreferrer">🗺️ Googleマップ</a></div></div>`;
+
+  /* 🅱️ 越中島ルート：元の第2ルート機能を維持し、実在する西葛20乙へ修正 */
+  const B=planGoEcc(sel,dt);
+  h+=`<div class="route"><h2>🅱️ 越中島・葛西臨海公園ルート</h2><div class="meta">門19 → 京葉線 → 西葛20乙 → 西葛西駅 → 徒歩7分</div><div class="tl">`;
+  h+=st("dep",fmt(sel),"豊洲一丁目 発（門19）");
+  h+=st("",fmt(B.ba),"越中島 バス停 着");
+  if(B.end){h+=`</div><div class="none">京葉線の本日便なし、または内蔵時刻以降の便なし</div>`;}
+  else{
+    h+=st("",fmt(B.kd),"越中島 発（京葉線・各駅停車）",B.wk);
+    h+=st("",fmt(B.ka),"葛西臨海公園 着");
+    if(B.rmiss){h+=`</div><div class="none">西葛20乙の当日ダイヤ未収録</div>`;}
+    else if(B.rend){h+=`</div><div class="none">西葛20乙の本日便なし</div>`;}
+    else{
+      h+=st("",fmt(B.rd),"葛西臨海公園駅前 発（西葛20乙・西葛西駅前行）",B.wr);
+      h+=st("",fmt(B.nk),"第七葛西小学校前 着");
+      h+=st("goal",fmt(B.g),"🌈 虹の広場 着");
+      h+=`</div><div class="total">所要 約${B.tot}分</div>`;
+    }
+  }
+  h+=`<div class="demerits"><b>⚠️ デメリット</b><br>・越中島まで炎天下歩く<br>・越中島駅暑い<br>・葛西臨海公園駅激混み<br>・バス待ちが炎天下<br>・バスも混んでる</div>`;
+  h+=`<div class="minilinks"><a href="${L.apKasaiRinkai}" target="_blank" rel="noopener noreferrer">西葛20乙 接近</a><a href="${L.west20B}" target="_blank" rel="noopener noreferrer">西葛20乙 時刻表</a><a href="${L.jrEcchujima}" target="_blank" rel="noopener noreferrer">JR越中島駅</a></div></div>`;
+  return h;
+}
+
+function sosGo(dt,nm,selDep){
+  const kai=DATA.goKai01[dt.bus]||[];
+  const ref=(selDep!=null?selDep:nm)+T.walkHomeToSansho;
+  const n=n3(kai,ref);
+  let h=`<details class="sos"><summary>🆘 🆘 門19に乗り遅れたら（海01・都立三商前）</summary><div class="inner">`;
+  if(!n.length){h+=`海01の当日ダイヤ未収録。<a href="${L.kai01Go}" target="_blank" rel="noopener noreferrer">公式時刻表を開く</a>`;}
+  else{
+    h+=`都立三商前まで徒歩約5分。到着見込み以降の海01（門前仲町行き）<br>`;
+    h+=`次の海01: <b>${n.join(" / ")}</b><br>`;
+    h+=`乗り継ぎは門19と同じ（門仲バス停→駅15分→東西線→西葛西→徒歩7分）`;
+  }
+  h+=`<br><a href="${L.kai01Go}" target="_blank" rel="noopener noreferrer">海01時刻表(公式)</a></div></details>`;
+  return h;
+}
+
+function renderBack(dt,nm){
+  const bus=DATA.backMon19[dt.bus]||[];
+  const readyAt=nm+30;
+  const cands=bus.map(toM).filter(m=>m>=readyAt).slice(0,6);
+  if(!cands.length)return`<div class="route"><div class="none">門19（門前仲町発）は本日終了または未収録です。</div><div class="minilinks"><a href="${L.apMonzen}" target="_blank" rel="noopener noreferrer">🚌 門19接近</a><a href="${L.gmapBack}" target="_blank" rel="noopener noreferrer">🗺️ Googleマップ</a></div></div>`;
+  let sel=cands.includes(SELBACK)?SELBACK:cands[0];
+  let h=`<div class="pickwrap"><div class="picklabel">門19 門前仲町発 — 何時のバスで帰る？（30分後〜）</div><div class="chips">`;
+  for(const m of cands){h+=`<div class="chip${m===sel?" on":""}" onclick="pickBack(${m})"><div class="ct">${fmt(m)}</div><div class="cl">門19</div></div>`;}
+  h+=`</div></div>`;
+  /* 逆算: 門19発→門仲駅着→東西線→西葛西→徒歩→虹出発 */
+  const busStop=sel-T.walkMonStaToBus;
+  const monArr=busStop;
+  const metroArr=monArr-T.metroNkToMon;
+  const metro=DATA.nishikasaiMetro[dt.rail]||[];
+  h+=`<div class="route"><h2>🏠 帰り（門前仲町ルート）</h2><div class="meta">東西線 → 門19</div>`;
+  if(!metro.length){
+    /* 土休日: 電車未収録 */
+    h+=`<a class="linkout" href="${L.metroT16}" target="_blank" rel="noopener noreferrer">東西線 土休日時刻表を開く</a>`;
+    h+=`<div class="total">門前仲町に${fmt(busStop)}までに着けばOK → 門19 <b>${fmt(sel)}</b> 発 → 豊洲一丁目 <b>${fmt(sel+T.busMon19Home)}</b> 着</div>`;
+  }else{
+    /* 門仲にbusStopまでに着く東西線 = metroArr以前に西葛西を出る最後の電車 */
+    let lastMetro=null;
+    for(const t of metro){const m=toM(t);if(m<=metroArr)lastMetro=m;else break;}
+    if(!lastMetro){
+      h+=`<div class="none">この門19に間に合う東西線が見つかりません。</div>`;
+    }else{
+      h+=`<div class="tl">`;
+      h+=st("dep",fmt(lastMetro),"西葛西 発（東西線）");
+      h+=st("",fmt(lastMetro+T.metroNkToMon),"門前仲町 着");
+      h+=st("",fmt(sel),"門前仲町 発（門19）",sel-busStop);
+      h+=st("goal",fmt(sel+T.busMon19Home),"豊洲一丁目 着");
+      h+=`</div><div class="total">西葛西 <b>${fmt(lastMetro)}</b> 発に乗れば間に合う</div>`;
+    }
+  }
+  h+=sosBack(dt,nm,sel);
+  h+=`<div class="minilinks"><a href="${L.apMonzen}" target="_blank" rel="noopener noreferrer">🚌 門19接近（門仲）</a><a href="${L.gmapBack}" target="_blank" rel="noopener noreferrer">🗺️ Googleマップ</a></div></div>`;
+  return h;
+}
+
+function sosBack(dt,nm,monBusDep){
+  const kai=DATA.backKai01[dt.bus]||[];
+  const ref=(monBusDep!=null?monBusDep:nm+T.walkNijiToNk+T.metroNkToMon+T.walkMonStaToBus)+T.walkMonBus6ToKai5;
+  const n=n3(kai,ref);
+  let h=`<details class="sos"><summary>🆘 🆘 門19に乗り遅れたら（海01・都立三商前降車）</summary><div class="inner">`;
+  if(!n.length){h+=`海01の当日ダイヤ未収録。<a href="${L.kai01Back}" target="_blank" rel="noopener noreferrer">公式時刻表を開く</a>`;}
+  else{
+    h+=`門19の6番のりばから海01の5番のりばへ移動し、海01（テレポート方面）で都立三商前へ（約7分）<br>`;
+    h+=`門仲発の次の海01: <b>${n.join(" / ")}</b>`;
+  }
+  h+=`<br><a href="${L.kai01Back}" target="_blank" rel="noopener noreferrer">海01時刻表(公式)</a></div></details>`;
+  return h;
+}
+
+function parseLocalDateTime(v){const m=String(v||"").match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/);return m?new Date(Number(m[1]),Number(m[2])-1,Number(m[3]),Number(m[4]),Number(m[5]),0,0):null;}
+function applyDebug(){const v=document.getElementById("dbgdt").value,d=parseLocalDateTime(v);if(d&&!isNaN(d.getTime())){DBG=d;SELGO=null;SELBACK=null;render();}}
+function clearDebug(){DBG=null;SELGO=null;SELBACK=null;document.getElementById("dbgdt").value="";render();}
+function renderDbg(dt,nm){
+  const el=document.getElementById("dbglog");if(!DBG){el.textContent="";return;}
+  const li=(n,a)=>`${n}: `+(a&&a.length?(n3(a,nm).join(" / ")||"以降なし"):"未収録");
+  el.textContent=`判定:${dt.label} / データ: 門19 2024-01-15・海01 2026-04-01・西葛20乙 2024-04-01
+ bus=${dt.bus} rail=${dt.rail} now=${fmt(nm)}\n${li("門19豊洲",DATA.goBus[dt.bus])}\n${li("海01都立三商前",DATA.goKai01[dt.bus])}\n${li("東西線門仲",DATA.monzenMetro[dt.rail])}\n${li("京葉線越中島",DATA.echujimaKeiyo[dt.rail])}\n${li("西葛20乙",DATA.west20B[dt.bus])}\n${li("西葛西→中野",DATA.nishikasaiMetro[dt.rail])}\n${li("門19門仲帰り",DATA.backMon19[dt.bus])}\n${li("海01門仲帰り",DATA.backKai01[dt.bus])}`;
+}
+function showFatalError(err){
+  const content=document.getElementById("content"),log=document.getElementById("dbglog");
+  const msg=err&&err.message?err.message:String(err||"不明なエラー");
+  if(content)content.innerHTML=`<div class="route"><h2>表示処理でエラーが発生しました</h2><div class="none">${msg}</div><div class="total">元の全機能はHTML内に残っています。Safariで開き直すか、下のデバッグ欄でエラーを確認してください。</div></div>`;
+  if(log)log.textContent="ERROR: "+msg;
+}
+window.onerror=function(message,source,line,column,error){showFatalError(error||message);return false;};
+try{render();window.setInterval(function(){if(!DBG)render();},30000);}catch(e){showFatalError(e);}
 </script>
 </body>
 </html>
