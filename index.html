@@ -97,6 +97,9 @@ details.debug{margin:9px 0 16px;border-top:1px solid var(--line);padding-top:13p
 .fallback{margin-top:2px}.fallback p{font-size:13px;line-height:1.7;color:var(--sub)}
 @media(max-width:420px){header{padding-left:16px;padding-right:16px}.tabs,section{padding-left:16px;padding-right:16px}.appicon{width:48px;height:48px;border-radius:15px}.brandcopy .eyebrow{font-size:10px}header h1{font-size:23px}.headmeta{width:100%;margin-left:61px;justify-content:flex-start}.route{padding:16px;border-radius:21px}.step{font-size:13px}.step b.t{min-width:49px;font-size:16px}}
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+.dia-alert{background:#ff4444;color:#fff;padding:10px 14px;border-radius:10px;margin:10px 16px;font-size:14px;font-weight:600;text-align:center}
+.dia-alert a{color:#fff;text-decoration:underline}
+.dia-warn{background:#e6a700;color:#1a1a2e;padding:10px 14px;border-radius:10px;margin:10px 16px;font-size:14px;font-weight:600;text-align:center}
 
 </style>
 </head>
@@ -110,6 +113,7 @@ details.debug{margin:9px 0 16px;border-top:1px solid var(--line);padding-top:13p
   <button type="button" class="tab on" id="tabGo" onclick="setTab('go')" role="tab" aria-selected="true">行き</button>
   <button type="button" class="tab" id="tabBack" onclick="setTab('back')" role="tab" aria-selected="false">帰り</button>
 </div>
+<div id="diaAlert"></div>
 <section id="noticeArea"></section>
 <section id="content">
   <div class="route fallback"><h2>🅰️ 門前仲町ルート</h2><div class="meta">門19 → 東西線（西葛西停車）→ 徒歩7分</div><p>Safariで開くと、現在時刻から次のバス・電車・到着見込みを自動計算します。</p></div>
@@ -124,6 +128,7 @@ details.debug{margin:9px 0 16px;border-top:1px solid var(--line);padding-top:13p
 </section>
 <script>
 "use strict";
+const DATA_REVISION="2026-07-22";
 const DATA={
 goBus:{
 weekday:["07:03","07:19","07:35","07:50","08:06","08:22","08:37","08:54","09:15","09:32","10:06","10:38","11:25","12:19","13:09","14:03","14:50","15:29","15:57","16:20","16:48","17:14","17:38","18:02","18:28","18:55","19:31","20:01","20:38","21:17","21:54"],
@@ -389,6 +394,24 @@ function renderDbg(dt,nm){
   el.textContent=`判定:${dt.label} / データ: 門19 2024-01-15・海01 2026-04-01・西葛20乙 2024-04-01
  bus=${dt.bus} rail=${dt.rail} now=${fmt(nm)}\n${li("門19豊洲",DATA.goBus[dt.bus])}\n${li("海01都立三商前",DATA.goKai01[dt.bus])}\n${li("東西線門仲",DATA.monzenMetro[dt.rail])}\n${li("京葉線越中島",DATA.echujimaKeiyo[dt.rail])}\n${li("西葛20乙",DATA.west20B[dt.bus])}\n${li("西葛西→中野",DATA.nishikasaiMetro[dt.rail])}\n${li("門19門仲帰り",DATA.backMon19[dt.bus])}\n${li("海01門仲帰り",DATA.backKai01[dt.bus])}`;
 }
+async function checkDiaAlert(){
+  try{
+    const r=await fetch("dia-alert.json?"+Date.now());
+    if(!r.ok)return;
+    const d=await r.json();
+    const el=document.getElementById("diaAlert");
+    const last=new Date(d.lastChecked);
+    const days=(Date.now()-last.getTime())/86400000;
+    if(days>30){el.innerHTML='<div class="dia-warn">🟡 ダイヤ監視が30日以上停止しています</div>';return;}
+    const rev=new Date(DATA_REVISION);
+    const recent=(d.alerts||[]).filter(a=>new Date(a.date)>rev);
+    if(recent.length){
+      const src=[...new Set(recent.map(a=>a.source))].join("・");
+      el.innerHTML=`<div class="dia-alert">🔴 ${src}でダイヤ改正の発表を検知しました。時刻が変わっている可能性があります</div>`;
+    }
+  }catch(e){}
+}
+
 function showFatalError(err){
   const content=document.getElementById("content"),log=document.getElementById("dbglog");
   const msg=err&&err.message?err.message:String(err||"不明なエラー");
@@ -396,7 +419,7 @@ function showFatalError(err){
   if(log)log.textContent="ERROR: "+msg;
 }
 window.onerror=function(message,source,line,column,error){showFatalError(error||message);return false;};
-try{render();window.setInterval(function(){if(!DBG)render();},30000);}catch(e){showFatalError(e);}
+try{render();checkDiaAlert();window.setInterval(function(){if(!DBG)render();},30000);}catch(e){showFatalError(e);}
 </script>
 </body>
 </html>
